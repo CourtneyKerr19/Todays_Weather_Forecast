@@ -78,14 +78,21 @@ function displayWeather(data) {
 
 function displayHourlyForecast(hourlyData) {
   const hourlyForecastDiv = document.getElementById("hourly-forecast");
-  const next24Hours = hourlyData.slice(0, 8);
 
-  hourlyForecastDiv.innerHTML = ""; 
+  // Clear previous content
+  hourlyForecastDiv.innerHTML = "";
+
+  if (!hourlyData || hourlyData.length === 0) {
+    console.error("No hourly data available.");
+    return;
+  }
+
+  const next24Hours = hourlyData.slice(0, 8); // Next 8 intervals (3 hours each)
 
   next24Hours.forEach(item => {
-    const dateTime = new Date(item.dt * 1000); 
+    const dateTime = new Date(item.dt * 1000);
     const hour = dateTime.getHours();
-    const temperature = Math.round(item.main.temp - 273.15); 
+    const temperature = Math.round(item.main.temp - 273.15);
     const iconCode = item.weather[0].icon;
     const iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
 
