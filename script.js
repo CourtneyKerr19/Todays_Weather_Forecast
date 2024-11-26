@@ -7,3 +7,6 @@ function getWeather() {
     return;
   }
 }
+
+const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
+const forecaseUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}`;
