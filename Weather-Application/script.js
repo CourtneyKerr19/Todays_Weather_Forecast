@@ -107,6 +107,24 @@ function displayHourlyForecast(hourlyData) {
   });
 }
 
+function displayDateTime() {
+  const now = new Date();
+  const dateTime = {
+    date: now.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+    time: now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+    day: now.toLocaleDateString("en-US", { weekday: "long" })
+  };
+
+  console.log("DateTime Object:", dateTime);
+
+  const dateTimeDiv = document.getElementById("date-time");
+  dateTimeDiv.innerHTML = `
+    <p>${dateTime.day}, ${dateTime.date}</p>
+    <p>${dateTime.time}</p>
+  `;
+}
+
+
 function showImage() {
   const weatherIcon = document.getElementById("weather-icon");
   weatherIcon.style.display = "block";
