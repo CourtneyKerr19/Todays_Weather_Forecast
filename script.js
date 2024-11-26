@@ -22,3 +22,15 @@ function getWeather() {
       alert('Error fetching current weather data. Please try again.')
     })
 }
+
+function getWeather() {
+  fetch(forcastUrl)
+    .then(response => response.json())
+    .then(data => {
+      displayHourlyForecast(data.list);
+    })
+    .catch(error => {
+      console.error('Error fetching the hourly forecast data in your area:', error);
+      alert('Error fetching hourly forecast data. Please try again.')
+    })
+}
