@@ -47,3 +47,17 @@ function displayWeather(data) {
   hourlyForecastDiv.innerHTML = '';
   tempDivInfo.innerHTML = '';
 }
+
+function displayWeather(data) {
+
+  if (data.cod === '404') {
+    weatherInfoDiv.innerHTML = `<p>${data.message}</p>`;
+  } else {
+
+    const cityName = data.name;
+    const temperature = Math.round(data.main.temp - 273.15);
+    const description = data.weather[0].description;
+    const iconCode = data.weather[0].icon;
+    const iconUrl = `http://openweathermap.org/img/wn/${iconCode}@4x.png`;
+  }
+}
