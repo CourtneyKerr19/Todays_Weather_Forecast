@@ -72,3 +72,12 @@ function displayWeather(data) {
     showImage();
   }
 }
+
+function displayHourlyForecast(hourlyData) {
+  const hourlyForecastDiv = document.getElementById('hourly-forecast');
+  const next24Hours = hourlyData.slice(0, 8);
+
+  next24Hours.forEach(item => {
+
+  });
+}
