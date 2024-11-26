@@ -1,106 +1,90 @@
 function getWeather() {
-  const apiKey = "bbc3200cce48b4fecdf5a1598bcefd26";
-  const city = document.getElementById("city").value;
+  const cityName = document.getElementById("city").value;
 
-  if (!city) {
+  if (!cityName) {
     alert("Please enter a city name.");
     return;
   }
 
-  const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
-  const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}`;
+  // Display the current date and time
+  displayDateTime();
 
-  // Fetch current weather
+  const apiKey = "bbc3200cce48b4fecdf5a1598bcefd26";
+  const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`;
+  const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}`;
+
+  // Fetch Current Weather
   fetch(currentWeatherUrl)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("City not found");
-      }
-      return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-      displayWeather(data);
+      // Create City Object
+      const city = {
+        name: data.name,
+        latitude: data.coord.lat,
+        longitude: data.coord.lon
+      };
+
+      // Create Weather Object
+      const weather = {
+        temperature: Math.round(data.main.temp - 273.15), // Convert Kelvin to Celsius
+        description: data.weather[0].description,
+        icon: `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`
+      };
+
+      displayWeather(city, weather);
     })
     .catch(error => {
-      console.error("Error fetching current weather data:", error);
-      alert("Error fetching current weather data. Please try again.");
+      console.error("Error fetching weather data:", error);
+      alert("Error fetching weather data. Please try again.");
     });
 
-  // Fetch hourly forecast
+  // Fetch Hourly Forecast
   fetch(forecastUrl)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("City not found");
-      }
-      return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-      displayHourlyForecast(data.list);
+      const forecasts = data.list.slice(0, 8).map(item => ({
+        time: new Date(item.dt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        temperature: Math.round(item.main.temp - 273.15), // Convert Kelvin to Celsius
+        icon: `http://openweathermap.org/img/wn/${item.weather[0].icon}.png`
+      }));
+
+      displayHourlyForecast(forecasts);
     })
     .catch(error => {
-      console.error("Error fetching hourly forecast data:", error);
-      alert("Error fetching hourly forecast data. Please try again.");
+      console.error("Error fetching forecast data:", error);
+      alert("Error fetching forecast data. Please try again.");
     });
 }
 
-function displayWeather(data) {
-  const tempDivInfo = document.getElementById("temp-div");
-  const weatherInfoDiv = document.getElementById("weather-info");
+function displayWeather(city, weather) {
+  const tempDiv = document.getElementById("temp-div");
+  const weatherInfo = document.getElementById("weather-info");
   const weatherIcon = document.getElementById("weather-icon");
-  const hourlyForecastDiv = document.getElementById("hourly-forecast");
 
   // Clear previous data
-  weatherInfoDiv.innerHTML = "";
-  hourlyForecastDiv.innerHTML = "";
-  tempDivInfo.innerHTML = "";
+  tempDiv.innerHTML = "";
+  weatherInfo.innerHTML = "";
+  weatherIcon.src = "";
 
-  if (data.cod === "404") {
-    weatherInfoDiv.innerHTML = `<p>${data.message}</p>`;
-    return;
-  }
-
-  const cityName = data.name;
-  const temperature = Math.round(data.main.temp - 273.15); 
-  const description = data.weather[0].description;
-  const iconCode = data.weather[0].icon;
-  const iconUrl = `http://openweathermap.org/img/wn/${iconCode}@4x.png`;
-
-  const temperatureHTML = `<p>${temperature}°C</p>`;
-  const weatherHTML = `<p>${cityName}</p><p>${description}</p>`;
-
-  tempDivInfo.innerHTML = temperatureHTML;
-  weatherInfoDiv.innerHTML = weatherHTML;
-  weatherIcon.src = iconUrl;
-  weatherIcon.alt = description;
+  // Update Weather Information
+  tempDiv.innerHTML = `<p>${weather.temperature}°C</p>`;
+  weatherInfo.innerHTML = `<p>${city.name}</p><p>${weather.description}</p>`;
+  weatherIcon.src = weather.icon;
+  weatherIcon.alt = weather.description;
 
   showImage();
 }
 
-function displayHourlyForecast(hourlyData) {
+function displayHourlyForecast(forecasts) {
   const hourlyForecastDiv = document.getElementById("hourly-forecast");
+  hourlyForecastDiv.innerHTML = ""; // Clear previous forecast
 
-  // Clear previous content
-  hourlyForecastDiv.innerHTML = "";
-
-  if (!hourlyData || hourlyData.length === 0) {
-    console.error("No hourly data available.");
-    return;
-  }
-
-  const next24Hours = hourlyData.slice(0, 8); // Next 8 intervals (3 hours each)
-
-  next24Hours.forEach(item => {
-    const dateTime = new Date(item.dt * 1000);
-    const hour = dateTime.getHours();
-    const temperature = Math.round(item.main.temp - 273.15);
-    const iconCode = item.weather[0].icon;
-    const iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
-
+  forecasts.forEach(forecast => {
     const hourlyItemHtml = `
       <div class="hourly-item">
-        <span>${hour}:00</span>
-        <img src="${iconUrl}" alt="Hourly Weather Icon">
-        <span>${temperature}°C</span>
+        <span>${forecast.time}</span>
+        <img src="${forecast.icon}" alt="Hourly Weather Icon">
+        <span>${forecast.temperature}°C</span>
       </div>
     `;
     hourlyForecastDiv.innerHTML += hourlyItemHtml;
@@ -108,6 +92,7 @@ function displayHourlyForecast(hourlyData) {
 }
 
 function displayDateTime() {
+  // Create DateTime Object
   const now = new Date();
   const dateTime = {
     date: now.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
@@ -115,6 +100,7 @@ function displayDateTime() {
     day: now.toLocaleDateString("en-US", { weekday: "long" })
   };
 
+  // Display DateTime
   console.log("DateTime Object:", dateTime);
 
   const dateTimeDiv = document.getElementById("date-time");
@@ -123,7 +109,6 @@ function displayDateTime() {
     <p>${dateTime.time}</p>
   `;
 }
-
 
 function showImage() {
   const weatherIcon = document.getElementById("weather-icon");
