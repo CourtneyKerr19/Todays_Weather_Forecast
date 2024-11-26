@@ -1,3 +1,18 @@
+document.getElementById("search-button").addEventListener("click", getWeather); 
+document.getElementById("city").addEventListener("keypress", function (event) { 
+  if (event.key === "Enter") {
+    getWeather();
+  }
+});
+
+document.getElementById("clear-button").addEventListener("click", function () { 
+  document.getElementById("temp-div").innerHTML = "";
+  document.getElementById("weather-info").innerHTML = "";
+  document.getElementById("weather-icon").style.display = "none";
+  document.getElementById("hourly-forecast").innerHTML = "";
+  document.getElementById("date-time").innerHTML = "";
+});
+
 function getWeather() {
   const cityName = document.getElementById("city").value;
 
@@ -6,27 +21,23 @@ function getWeather() {
     return;
   }
 
-  // Display the current date and time
   displayDateTime();
 
   const apiKey = "bbc3200cce48b4fecdf5a1598bcefd26";
   const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}`;
   const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}`;
 
-  // Fetch Current Weather
   fetch(currentWeatherUrl)
     .then(response => response.json())
     .then(data => {
-      // Create City Object
       const city = {
         name: data.name,
         latitude: data.coord.lat,
         longitude: data.coord.lon
       };
 
-      // Create Weather Object
       const weather = {
-        temperature: Math.round(data.main.temp - 273.15), // Convert Kelvin to Celsius
+        temperature: Math.round(data.main.temp - 273.15), 
         description: data.weather[0].description,
         icon: `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`
       };
@@ -38,13 +49,12 @@ function getWeather() {
       alert("Error fetching weather data. Please try again.");
     });
 
-  // Fetch Hourly Forecast
   fetch(forecastUrl)
     .then(response => response.json())
     .then(data => {
       const forecasts = data.list.slice(0, 8).map(item => ({
         time: new Date(item.dt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        temperature: Math.round(item.main.temp - 273.15), // Convert Kelvin to Celsius
+        temperature: Math.round(item.main.temp - 273.15), 
         icon: `http://openweathermap.org/img/wn/${item.weather[0].icon}.png`
       }));
 
@@ -66,7 +76,6 @@ function displayWeather(city, weather) {
   weatherInfo.innerHTML = "";
   weatherIcon.src = "";
 
-  // Update Weather Information
   tempDiv.innerHTML = `<p>${weather.temperature}°C</p>`;
   weatherInfo.innerHTML = `<p>${city.name}</p><p>${weather.description}</p>`;
   weatherIcon.src = weather.icon;
@@ -77,7 +86,7 @@ function displayWeather(city, weather) {
 
 function displayHourlyForecast(forecasts) {
   const hourlyForecastDiv = document.getElementById("hourly-forecast");
-  hourlyForecastDiv.innerHTML = ""; // Clear previous forecast
+  hourlyForecastDiv.innerHTML = ""; 
 
   forecasts.forEach(forecast => {
     const hourlyItemHtml = `
@@ -92,7 +101,6 @@ function displayHourlyForecast(forecasts) {
 }
 
 function displayDateTime() {
-  // Create DateTime Object
   const now = new Date();
   const dateTime = {
     date: now.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
@@ -100,7 +108,6 @@ function displayDateTime() {
     day: now.toLocaleDateString("en-US", { weekday: "long" })
   };
 
-  // Display DateTime
   console.log("DateTime Object:", dateTime);
 
   const dateTimeDiv = document.getElementById("date-time");
