@@ -41,5 +41,9 @@ function displayWeather(data) {
   const weatherInfoDiv = document.getElementById('weather-info');
   const weatherIcon = document.getElementById('weather-icon');
   const hourlyForecastDiv = document.getElementById('hourly-forecast');
-
+  
+  //Clear previous data so all the new data can be displayed clearly
+  weatherInfoDiv.innerHTML = '';
+  hourlyForecastDiv.innerHTML = '';
+  tempDivInfo.innerHTML = '';
 }
